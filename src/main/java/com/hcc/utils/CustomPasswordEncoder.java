@@ -1,6 +1,5 @@
 package com.hcc.utils;
 
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -18,3 +17,5 @@ public class CustomPasswordEncoder {
         return passwordEncoder;
     }
 }
+
+//add users if none are found
