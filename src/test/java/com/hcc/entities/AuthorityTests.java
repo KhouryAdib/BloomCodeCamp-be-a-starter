@@ -1,11 +1,13 @@
 package com.hcc.entities;
 
+import com.hcc.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +26,8 @@ public class AuthorityTests {
 
     @BeforeEach
     public void setup() {
-        auth1 = new Authority("ADMIN");
-        auth2 = new Authority("LEARNER");
+        auth1 = new Authority("ADMIN" , new User());
+        auth2 = new Authority("LEARNER" , new User());
         auth3 = new Authority(auth2);
     }
 
@@ -35,6 +37,7 @@ public class AuthorityTests {
         assertNull(auth1.getUser());
         auth1.setAuthority("USER");
         assertEquals("USER", auth1.getAuthority());
+
         User user = new User();
         auth1.setUser(user);
         assertEquals(user, auth1.getUser());

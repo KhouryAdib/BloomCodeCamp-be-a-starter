@@ -27,7 +27,7 @@ public class UserResource {
 
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
-        User user = userService.registerUser(new Date(Long.MAX_VALUE),username,password);
+ //       User user = userService.registerUser(new Date(Long.MAX_VALUE),username,password);
 
         Map<String, String> map = new HashMap<>();
         map.put("message", "registered successfully");

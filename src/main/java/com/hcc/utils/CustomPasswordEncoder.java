@@ -17,5 +17,3 @@ public class CustomPasswordEncoder {
         return passwordEncoder;
     }
 }
-
-//add users if none are found

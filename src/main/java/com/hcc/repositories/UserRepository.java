@@ -11,15 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    Integer create(Date cohort_start_date, String username, String password) throws EtAuthException;
-    Optional<User> findByUsernameAndPassword(String username, String password) throws EtAuthException;
-    Integer getCountByUsername(String username);
-
-    Optional<User> findByUserId(Long userId);
     Optional<User> findByUsername(String username);
-
-    Optional<User> findById(int uId);
 }

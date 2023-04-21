@@ -13,21 +13,23 @@ public class Assignment {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = false)
+    @Column()
     private Integer number;
 
-    @Column(nullable = false)
+    @Column()
     private String githubUrl;
 
+    @Column()
     private String branch;
 
+    @Column()
     private String reviewVideoUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "code_reviewer_id")
     private User codeReviewer;
 

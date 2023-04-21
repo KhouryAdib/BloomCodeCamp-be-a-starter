@@ -1,113 +1,94 @@
 package com.hcc.services;
 
+import com.hcc.dto.UserDto;
+import com.hcc.entities.Authority;
 import com.hcc.entities.User;
-import com.hcc.exceptions.EtAuthException;
-import com.hcc.exceptions.ResourceNotFoundException;
+import com.hcc.enums.AuthorityEnum;
+import com.hcc.repositories.AuthorityRepository;
 import com.hcc.repositories.UserRepository;
 import com.hcc.utils.CustomPasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.NonUniqueResultException;
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepo;
 
-    @Autowired
-    CustomPasswordEncoder passwordEncoder;
+    private UserRepository userRepo;
 
-    @Override
-    public User validateUser(String email, String password) throws EtAuthException {
-        System.out.println("validateUser");
-        return null;
+
+    private AuthorityRepository authRepo;
+
+
+    private PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepo, AuthorityRepository authRepo, PasswordEncoder  passwordEncoder) {
+        this.userRepo = userRepo;
+        this.authRepo = authRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return (List<User>) userRepo.findAll();
-    }
-
-    @Override
-    public User getUserById(int uId) {
-        return  userRepo.findById(uId).orElse(null);
-    }
-
-    @Override
-    public User registerUser(Date date, String username, String password) throws EtAuthException {
-        Pattern pattern = Pattern.compile("^(.+)@(.+)$");
-        //check if email in correct format
-        if(username != null){
-            username = username.toLowerCase();
-        }
-        else {
-            throw new EtAuthException("Invalid username Format");
-        }
-
-        //check if email already in use
-
-        Integer count = userRepo.getCountByUsername(username);
-        if(count>0) {throw new EtAuthException("Email already in use");}
-        Integer userId = userRepo.create(date, username, password);
-
-        User user = userRepo.findByUserId(userId.longValue()).orElse(null);
-        if(user!=null) {
-            return user;
-        } else{
-            throw new ResourceNotFoundException("Cannot find Username");
-        }
-    }
-
-    @Override
-    public User addOrUpdateUser(User user) {
-        return userRepo.save(user);
-    }
-
-    @Override
-    public User deleteUser(int uId) throws UsernameNotFoundException{
-        User deletedUser = null;
-
-            deletedUser = userRepo.findById(uId).orElse(null);
-            if(deletedUser == null) {
-                throw new UsernameNotFoundException("User not Found");
-            }
-            else {
-               userRepo.deleteById((long) uId);
-            }
-
-        return null;
-    }
-
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOpt = userRepo.findByUsername(username);
+    public void save(UserDto userDto) {
+        System.out.println("UserServiceImpl.save: adding or Updating "+ userDto.toString());
         User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        if(userOpt.isPresent())
-        {
-            user = userOpt.get();
+        Authority authority = new Authority();
+
+        //Create an admin role if it doesn't exist.
+
+            authority = authRepo.findByAuthority("ADMIN");
+            if (authority == null) {
+                authority = new Authority("ADMIN" , user);
+                authRepo.save(authority);
+            }
+
+
+        user.setAuthorities(Arrays.asList(authority));
+        user.setCohortStartDate(new Date());
+
+
+        userRepo.save(user);
+    }
+
+    private Authority checkRoleExist(){
+        Authority role = authRepo.findByAuthority("ADMIN");
+        if(role == null){
+            role = new Authority();
+            role.setAuthority("ADMIN");
+            authRepo.save(role);
         }
-        else
-        {
-            throw new UsernameNotFoundException("Invalid Credentials");
-        }
+        return role;
+    }
 
-     //   user.setUsername(username);
-     //   user.setPassword(passwordEncoder.getPasswordEncoder().encode("asdfasdf"));
+    @Override
+    public User findByUsername(String username) {
+        System.out.println("UserServiceImpl.findByUsername "+ username);
+        return userRepo.findByUsername(username).orElse(null);
+    }
 
-        return new UserDetailsImpl(user);
+    @Override
+    public List<UserDto> findAllUsers() {
+        System.out.println("UserServiceImpl.findAllUsers ");
+        List<User> users = userRepo.findAll();
+        return users.stream()
+                .map((user) -> mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    private UserDto mapToUserDto(User user){
+        System.out.println("UserServiceImpl.mapToUserDto ");
+        UserDto userDto = new UserDto(user.getUsername(),user.getPassword());
+        return userDto;
     }
 }

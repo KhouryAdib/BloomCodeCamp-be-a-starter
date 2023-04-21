@@ -19,10 +19,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
-
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+    implementation 'org.projectlombok:lombok:1.18.20'
+	implementation 'org.jetbrains:annotations:20.1.0'
+	implementation 'org.jetbrains:annotations:20.1.0'
 	runtimeOnly 'org.postgresql:postgresql'
-
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
@@ -31,3 +34,21 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+
+bootJar {
+	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+compileJava {
+	options.compilerArgs << '-Aimmutables.includeNameAnnotations=javax.annotation.Generated'
+}
+
+compileTestJava {
+	options.compilerArgs << '-Aimmutables.includeNameAnnotations=javax.annotation.Generated'
+}

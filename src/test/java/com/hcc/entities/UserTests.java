@@ -1,5 +1,6 @@
 package com.hcc.entities;
 
+import com.hcc.enums.AuthorityEnum;
 import com.hcc.exceptions.NullAttributeException;
 import com.hcc.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +37,7 @@ public class UserTests {
 
     @BeforeEach
     public void setup() {
-        List<String> authorities = Arrays.asList("LEARNER", "ADMIN");
+        List<Authority> authorities = Arrays.asList(new Authority("ADMIN" , new User()), new Authority("LEARNER", new User()));
         user = new User(1L, new Date(), "testuser", "testpassword", authorities);
     }
 
@@ -93,7 +94,7 @@ public class UserTests {
         Date expectedCohortStartDate = new Date();
         String expectedUsername = "testuser";
         String expectedPassword = "testpassword";
-        List<String> expectedAuthorities = Arrays.asList("LEARNER", "ADMIN");
+        List<Authority> expectedAuthorities = Arrays.asList(new Authority("ADMIN", new User()), new Authority("LEARNER", new User()));
 
         // when
         user.setCohortStartDate(expectedCohortStartDate);
@@ -107,7 +108,7 @@ public class UserTests {
         Assertions.assertEquals(expectedPassword, user.getPassword());
         Assertions.assertEquals(expectedAuthorities.size(), user.getAuthorities().size());
         for (int i = 0; i < expectedAuthorities.size(); i++) {
-            Assertions.assertEquals(expectedAuthorities.get(i), user.getAuthorities().get(i).getAuthority());
+            Assertions.assertEquals(expectedAuthorities.get(i), user.getAuthoritiesStrings().get(i));
         }
     }
 
@@ -136,14 +137,14 @@ public class UserTests {
         user1.setCohortStartDate(new Date(1234567890L));
         user1.setUsername("testUser");
         user1.setPassword("password");
-        user1.setAuthorities(Arrays.asList("LEARNER", "ADMIN"));
+        user1.setAuthorities(Arrays.asList(new Authority("ADMIN_ROLE", new User()), new Authority("LEARNER_ROLE", new User())));
 
         User user2 = new User();
         user2.setId(0L);
         user2.setCohortStartDate(new Date(1234567890L));
         user2.setUsername("testUser");
         user2.setPassword("password");
-        user2.setAuthorities(Arrays.asList("LEARNER", "ADMIN"));
+        user2.setAuthorities(Arrays.asList(new Authority("ADMIN_ROLE", new User()), new Authority("LEARNER_ROLE", new User())));
 
         assertTrue(user1.equals(user2));
     }
@@ -155,14 +156,14 @@ public class UserTests {
         user1.setCohortStartDate(new Date(1234567890L));
         user1.setUsername("testUser1");
         user1.setPassword("password");
-        user1.setAuthorities(Arrays.asList("LEARNER", "ADMIN"));
+        user1.setAuthorities(Arrays.asList(new Authority("LEARNER_ROLE", new User())));
 
         User user2 = new User();
         user2.setId(1L);
         user2.setCohortStartDate(new Date(9876543210L));
         user2.setUsername("testUser2");
         user2.setPassword("password123");
-        user2.setAuthorities(Arrays.asList("ADMIN"));
+        user2.setAuthorities(Arrays.asList(new Authority("ADMIN_ROLE", new User())));
 
         assertFalse(user1.equals(user2));
     }

@@ -1,5 +1,18 @@
 package com.hcc.enums;
 
 public enum AuthorityEnum {
-    ADMIN, LEARNER, REVIEWER
+    LEARNER("LEARNER"),
+    REVIEWER("REVIEWER"),
+    ADMIN("ADMIN");
+
+
+    private final String value;
+
+    AuthorityEnum(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
